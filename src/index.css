@@ -1,2 +1,24 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+
+  --color-primary-start: rgb(99 46 227);
+  --color-primary-end: rgb(159 98 242);
+
+  --color-secondary: teal;
+}
+
+@layer utilities {
+  .text-primary-gradient {
+    background: linear-gradient(
+      90deg,
+      var(--color-primary-start),
+      var(--color-primary-end)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
