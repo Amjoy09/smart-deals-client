@@ -30,7 +30,7 @@ const Navbar = () => {
   );
   return (
     <div>
-      <div className="navbar bg-base-100 shadow-sm">
+      <div className="navbar bg-base-100 shadow-sm px-8">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -66,17 +66,32 @@ const Navbar = () => {
           <ul className="menu menu-horizontal px-1">{Links}</ul>
         </div>
         <div className="navbar-end space-x-10">
-          {customer && (
-            <img
-              className="h-17 w-17 rounded-full"
-              src={customer.photoURL || "https://via.placeholder.com/88"}
-              alt=""
-            />
-          )}
           {customer ? (
-            <NavLink onClick={handleLogOut} className="btn btn-primary">
-              LogOut
-            </NavLink>
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="cursor-pointer m-1">
+                <img
+                  className="h-12 w-12 rounded-full"
+                  src={
+                    customer?.photoURL || "https://i.ibb.co/4pDNDk1/avatar.png"
+                  }
+                  alt=""
+                />
+              </div>
+              <ul
+                tabIndex="-1"
+                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm space-y-1"
+              >
+                <li>
+                  <p className="text-lg text-center">{customer?.displayName}</p>
+                </li>
+                <li>
+                  <p>{customer?.email}</p>
+                </li>
+                <button className="btn btn-primary" onClick={handleLogOut}>
+                  LogOut
+                </button>
+              </ul>
+            </div>
           ) : (
             <NavLink className="btn btn-primary" to="/login">
               Login

@@ -4,14 +4,17 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../firebase/firebase.init";
 
 const AuthProvider = ({ children }) => {
-  const [customer, setCustomer] = useState("Wasi");
+  const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const googleProvider = new GoogleAuthProvider();
@@ -31,9 +34,26 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
+  const nameAndPhotoUpdate = (displayName, photoURL) => {
+    setLoading(true);
+    return updateProfile(auth.currentUser, {
+      displayName,
+      photoURL,
+    });
+  };
+
+  const verifyEmail = () => {
+    setLoading(true);
+    return sendEmailVerification(auth.currentUser);
+  };
+
   const googleLogIn = () => {
     setLoading(true);
     return signInWithPopup(auth, googleProvider);
+  };
+
+  const resetPassword = (email) => {
+    sendPasswordResetEmail(auth, email);
   };
 
   const authInfo = {
@@ -45,6 +65,9 @@ const AuthProvider = ({ children }) => {
     logInUser,
     logOutUser,
     googleLogIn,
+    nameAndPhotoUpdate,
+    verifyEmail,
+    resetPassword,
   };
 
   useEffect(() => {

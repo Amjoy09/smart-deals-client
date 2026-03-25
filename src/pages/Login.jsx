@@ -1,12 +1,17 @@
-import { use, useState } from "react";
+import { use, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const { logInUser, googleLogIn, setCustomer } = use(AuthContext);
+  const { logInUser, googleLogIn, setCustomer, resetPassword } =
+    use(AuthContext);
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state || "/";
+  const emailRef = useRef();
 
   const handleLogIn = (e) => {
     e.preventDefault();
@@ -18,19 +23,53 @@ const Login = () => {
         console.log(res);
         toast.success("Log In Successful");
         setCustomer(res.user);
+        navigate(from);
       })
       .catch((err) => {
+        const code = err.code;
+
+        if (code === "auth/invalid-credential") {
+          toast.error("Invalid email or password");
+        } else if (code === "auth/user-not-found") {
+          toast.error("No account found with this email");
+        } else if (code === "auth/wrong-password") {
+          toast.error("Incorrect password");
+        } else if (code === "auth/invalid-email") {
+          toast.error("Invalid email format");
+        } else if (code === "auth/user-disabled") {
+          toast.error("This account has been disabled");
+        } else if (code === "auth/too-many-requests") {
+          toast.error("Too many attempts. Try again later");
+        } else if (code === "auth/network-request-failed") {
+          toast.error("Network error. Check your internet");
+        } else if (code === "auth/internal-error") {
+          toast.error("Something went wrong. Try again");
+        } else {
+          toast.error("Login failed");
+        }
+
         console.log(err);
-        toast.error(err.messages);
       });
+  };
+
+  const handleForgetPass = () => {
+    const email = emailRef.current?.value;
+    resetPassword(email)
+      .then((res) => {
+        console.log(res);
+        toast.info("Check your Email to verify Password");
+      })
+      .catch((err) => console.log(err.code));
   };
 
   const handleGoogleLogIn = () => {
     googleLogIn()
       .then((res) => {
         console.log(res);
+
         toast.success("Log In with Google Successful");
         setCustomer(res.user);
+        navigate(from);
       })
       .catch((err) => {
         console.log(err);
@@ -45,6 +84,7 @@ const Login = () => {
         <form onSubmit={handleLogIn}>
           <input
             name="email"
+            ref={emailRef}
             placeholder="Email"
             className="input w-full mb-3"
             required
@@ -55,16 +95,25 @@ const Login = () => {
               name="password"
               type={show ? "text" : "password"}
               placeholder="Password"
-              className="input w-full mb-3"
+              className="input w-full"
               required
             />
             <button
+              type="button"
               onClick={() => setShow(!show)}
               className="absolute right-3 top-2.5 cursor-pointer"
             >
               {show ? "HIDE" : "SHOW"}
             </button>
           </div>
+
+          <button
+            onClick={handleForgetPass}
+            type="button"
+            className="hover:underline cursor-pointer my-3"
+          >
+            Forget Password?
+          </button>
 
           <button type="submit" className="btn btn-primary w-full">
             Login

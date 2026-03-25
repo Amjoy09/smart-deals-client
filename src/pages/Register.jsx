@@ -1,16 +1,26 @@
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { use, useState } from "react";
 import { toast } from "react-toastify";
 
 const Register = () => {
-  const { createUser } = use(AuthContext);
+  const {
+    createUser,
+    logOutUser,
+    nameAndPhotoUpdate,
+    verifyEmail,
+    setCustomer,
+  } = use(AuthContext);
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+
   const handleRegister = (e) => {
     e.preventDefault();
     const email = e.target.email?.value;
     const password = e.target.password?.value;
+    const displayName = e.target.displayName?.value;
+    const photoURL = e.target.photoURL?.value;
 
     const regExp =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -22,10 +32,23 @@ const Register = () => {
     }
 
     createUser(email, password)
-      .then((res) => {
-        console.log(res);
-        toast.success("Sign Up Successful");
+      .then(() => {
+        return nameAndPhotoUpdate(displayName, photoURL);
       })
+      .then(() => {
+        return verifyEmail();
+      })
+      .then(() => {
+        return logOutUser();
+      })
+      .then(() => {
+        setCustomer(null);
+        toast.success("Account created! Please verify your email");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      })
+
       .catch((err) => {
         console.log(err);
         toast.error(err.message);
