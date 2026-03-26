@@ -2,9 +2,11 @@ import { NavLink } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { use } from "react";
 import { toast } from "react-toastify";
+import { MoonLoader } from "react-spinners";
 
 const Navbar = () => {
-  const { customer, logOutUser, setCustomer } = use(AuthContext);
+  const { customer, logOutUser, setCustomer, loading } = use(AuthContext);
+  console.log(loading);
   const handleLogOut = () => {
     logOutUser()
       .then((res) => {
@@ -66,7 +68,9 @@ const Navbar = () => {
           <ul className="menu menu-horizontal px-1">{Links}</ul>
         </div>
         <div className="navbar-end space-x-10">
-          {customer ? (
+          {loading ? (
+            <MoonLoader size={40} />
+          ) : customer ? (
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="cursor-pointer m-1">
                 <img
