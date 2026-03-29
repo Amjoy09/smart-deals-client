@@ -7,8 +7,8 @@ const HeroSearch = () => {
         {/* Input */}
         <input
           type="text"
-          placeholder="Search here..."
-          className="w-full px-4 py-3 rounded-l-full border border-gray-300 focus:outline-none"
+          placeholder="Search for Products, Categories..."
+          className="w-full shadow-lg px-4 py-3 rounded-l-full border border-gray-300 focus:outline-none"
         />
 
         {/* Button */}

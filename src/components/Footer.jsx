@@ -1,9 +1,19 @@
 import React from "react";
+import { Link } from "react-router";
 
 const Footer = () => {
   return (
     <div>
       <footer className="footer sm:footer-horizontal bg-base-300 text-base-content p-10">
+        <div className="">
+          <Link to="/" className="font-semibold text-xl">
+            Smart<span className="text-primary">Deals</span>
+          </Link>
+          <p className="w-60">
+            Your trusted marketplace for authentic local products. Discover the
+            best deals from across Bangladesh.
+          </p>
+        </div>
         <nav>
           <h6 className="footer-title">Services</h6>
           <a className="link link-hover">Branding</a>

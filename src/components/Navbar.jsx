@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { use } from "react";
 import { toast } from "react-toastify";
@@ -22,7 +22,7 @@ const Navbar = () => {
       });
   };
   const Links = (
-    <>
+    <div className="flex text-[16px] font-sans">
       <li>
         <NavLink to="/">Home</NavLink>
       </li>
@@ -46,7 +46,7 @@ const Navbar = () => {
           </li>
         </>
       )}
-    </>
+    </div>
   );
   return (
     <div>
@@ -77,10 +77,10 @@ const Navbar = () => {
               {Links}
             </ul>
           </div>
-          <NavLink to="/" className="text-2xl font-bold cursor-pointer">
+          <Link to="/" className="text-2xl font-bold cursor-pointer">
             <span>Smart</span>
             <span className="text-gradient">Deals</span>
-          </NavLink>
+          </Link>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">{Links}</ul>

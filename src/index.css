@@ -17,9 +17,17 @@
     background-clip: text;
     color: transparent;
   }
+
+  .hero-bg {
+    background: linear-gradient(to right, #ffe6fd, #e0f8f5);
+  }
 }
 
 .bg-gradient {
   background: var(--color-gradient);
   color: white; /* optional for contrast */
+}
+
+a.active {
+  @apply text-primary;
 }
