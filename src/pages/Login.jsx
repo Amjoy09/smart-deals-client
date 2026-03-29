@@ -1,17 +1,28 @@
 import { use, useRef, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const { logInUser, googleLogIn, setCustomer, resetPassword } =
-    use(AuthContext);
+  const {
+    logInUser,
+    logOutUser,
+    googleLogIn,
+    customer,
+    setCustomer,
+    resetPassword,
+    setLoading,
+  } = use(AuthContext);
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state || "/";
   const emailRef = useRef();
+
+  if (customer) {
+    return <Navigate to="/" />;
+  }
 
   const handleLogIn = (e) => {
     e.preventDefault();
@@ -20,9 +31,17 @@ const Login = () => {
 
     logInUser(email, password)
       .then((res) => {
-        console.log(res);
+        if (!res.user.emailVerified) {
+          toast.error("Please verify your email first");
+          logOutUser(); // ✅ force logout
+          setCustomer(null); // ✅ clear state
+
+          return;
+        }
+
         toast.success("Log In Successful");
         setCustomer(res.user);
+        setLoading(false);
         navigate(from);
       })
       .catch((err) => {
@@ -47,7 +66,7 @@ const Login = () => {
         } else {
           toast.error("Login failed");
         }
-
+        setLoading(false);
         console.log(err);
       });
   };
@@ -115,7 +134,7 @@ const Login = () => {
             Forget Password?
           </button>
 
-          <button type="submit" className="btn btn-primary w-full">
+          <button type="submit" className="btn bg-gradient w-full">
             Login
           </button>
           <div className="divider">OR</div>
@@ -130,7 +149,10 @@ const Login = () => {
 
           <p className="text-center mt-3">
             New here?{" "}
-            <Link to="/register" className="text-blue-500 hover:underline">
+            <Link
+              to="/register"
+              className="text-gradient hover:underline font-semibold"
+            >
               Register Now
             </Link>
           </p>

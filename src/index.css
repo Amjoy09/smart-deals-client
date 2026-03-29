@@ -4,21 +4,22 @@
   name: "light";
   default: true;
 
-  --color-primary-start: rgb(99 46 227);
-  --color-primary-end: rgb(159 98 242);
+  --color-primary: rgb(99 46 227);
+  --color-secondary: rgb(159 98 242);
 
-  --color-secondary: teal;
+  --color-gradient: linear-gradient(90deg, rgb(99 46 227), rgb(159 98 242));
 }
 
 @layer utilities {
-  .text-primary-gradient {
-    background: linear-gradient(
-      90deg,
-      var(--color-primary-start),
-      var(--color-primary-end)
-    );
+  .text-gradient {
+    background: var(--color-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
+}
+
+.bg-gradient {
+  background: var(--color-gradient);
+  color: white; /* optional for contrast */
 }

@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { use } from "react";
 import { toast } from "react-toastify";
@@ -6,13 +6,15 @@ import { MoonLoader } from "react-spinners";
 
 const Navbar = () => {
   const { customer, logOutUser, setCustomer, loading } = use(AuthContext);
-  console.log(loading);
+
+  const navigate = useNavigate();
   const handleLogOut = () => {
     logOutUser()
       .then((res) => {
         console.log(res);
         toast.success("Sign Out Successful");
         setCustomer(null);
+        navigate("/login");
       })
       .catch((err) => {
         console.log(err);
@@ -28,6 +30,22 @@ const Navbar = () => {
       <li>
         <NavLink to="/all-products">All Products</NavLink>
       </li>
+
+      {customer && (
+        <>
+          {" "}
+          <li>
+            <NavLink to="/my-profile">Profile</NavLink>
+          </li>
+          <li>
+            {" "}
+            <NavLink to="/my-products">My Products</NavLink>
+          </li>
+          <li>
+            <NavLink to="/my-bids">My Bids</NavLink>
+          </li>
+        </>
+      )}
     </>
   );
   return (
@@ -59,9 +77,9 @@ const Navbar = () => {
               {Links}
             </ul>
           </div>
-          <NavLink to="/" className="text-2xl font-semibold cursor-pointer">
-            <span className="text-primary">Smart</span>
-            <span className="text-primary-gradient">Deals</span>
+          <NavLink to="/" className="text-2xl font-bold cursor-pointer">
+            <span>Smart</span>
+            <span className="text-gradient">Deals</span>
           </NavLink>
         </div>
         <div className="navbar-center hidden lg:flex">
@@ -69,7 +87,7 @@ const Navbar = () => {
         </div>
         <div className="navbar-end space-x-10">
           {loading ? (
-            <MoonLoader size={40} />
+            <MoonLoader color="blue" size={37} />
           ) : customer ? (
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="cursor-pointer m-1">
@@ -97,8 +115,8 @@ const Navbar = () => {
               </ul>
             </div>
           ) : (
-            <NavLink className="btn btn-primary" to="/login">
-              Login
+            <NavLink to="/login">
+              <button className="btn bg-gradient">Login</button>
             </NavLink>
           )}
         </div>

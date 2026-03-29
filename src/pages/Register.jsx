@@ -1,5 +1,5 @@
 import { FcGoogle } from "react-icons/fc";
-import { Link, useNavigate } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { use, useState } from "react";
 import { toast } from "react-toastify";
@@ -10,10 +10,15 @@ const Register = () => {
     logOutUser,
     nameAndPhotoUpdate,
     verifyEmail,
+    customer,
     setCustomer,
   } = use(AuthContext);
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
+
+  if (customer) {
+    return <Navigate to="/" />;
+  }
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -32,43 +37,64 @@ const Register = () => {
     }
 
     createUser(email, password)
-      .then(() => {
-        return nameAndPhotoUpdate(displayName, photoURL);
+      .then((result) => {
+        console.log(result);
+
+        return nameAndPhotoUpdate(displayName, photoURL).then(() => {
+          return result.user;
+        });
       })
-      .then(() => {
-        return verifyEmail();
+      .then((user) => {
+        const newCustomer = {
+          name: displayName,
+          email: user.email,
+          image: photoURL,
+        };
+
+        return fetch("http://localhost:3000/customers", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(newCustomer),
+        });
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Data after user save", data);
+        return verifyEmail;
       })
       .then(() => {
         return logOutUser();
       })
       .then(() => {
         setCustomer(null);
-        toast.success("Account created! Please verify your email");
+        toast.success("Account Created. Please Verify Email");
         setTimeout(() => {
           navigate("/login");
         }, 1000);
       })
-
       .catch((err) => {
         console.log(err);
         toast.error(err.message);
       });
   };
-
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="w-96 bg-base-100 shadow-xl p-8">
-        <h2 className="text-2xl font-semibold text-center mb-6">Register</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">
+          Register Now!
+        </h2>
 
         <form onSubmit={handleRegister}>
           <input
-            name="name"
+            name="displayName"
             placeholder="Name"
             className="input w-full mb-3"
             required
           />
           <input
-            name="photo"
+            name="photoURL"
             placeholder="Photo URL"
             className="input w-full mb-3"
             required
@@ -99,7 +125,7 @@ const Register = () => {
             </span>
           </div>
 
-          <button type="submit" className="btn btn-primary w-full">
+          <button type="submit" className="btn bg-gradient w-full">
             Register
           </button>
           <div className="divider">OR</div>
@@ -115,7 +141,7 @@ const Register = () => {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="text-blue-500 hover:underline
+              className="text-gradient font-semibold hover:underline
             "
             >
               Login
