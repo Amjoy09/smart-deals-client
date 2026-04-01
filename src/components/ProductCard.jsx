@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 
 const ProductCard = ({ product }) => {
   return (
@@ -17,9 +18,12 @@ const ProductCard = ({ product }) => {
             $ {product.price_min}-{product.price_max}
           </p>
           <div className="card-actions">
-            <button className="btn border w-full border-secondary text-gradient">
+            <Link
+              to={`/product-details/${product._id}`}
+              className="btn border w-full border-secondary text-gradient"
+            >
               View Details
-            </button>
+            </Link>
           </div>
         </div>
       </div>

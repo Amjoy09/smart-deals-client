@@ -7,7 +7,7 @@ const RecentProducts = ({ recentProductsPromise }) => {
   console.log(recentProducts);
 
   return (
-    <div className="project-bg py-14 px-14">
+    <div className="project-bg py-14 md:px-14 px-3">
       <h2 className="md:text-4xl text-3xl font-bold text-center mb-7">
         Recent <span className="text-primary">Products</span>
       </h2>
