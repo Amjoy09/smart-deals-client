@@ -1,10 +1,12 @@
-import React, { use, useRef } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { Link, useLoaderData } from "react-router";
 import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const ProductDetails = () => {
   const { customer } = use(AuthContext);
+  const [bids, setBids] = useState([]);
 
   const products = useLoaderData();
 
@@ -29,11 +31,20 @@ const ProductDetails = () => {
 
   const modalRef = useRef(null);
 
+  useEffect(() => {
+    fetch(`http://localhost:3000/products/bids/${productId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Bids for this Product", data);
+        setBids(data);
+      });
+  }, [productId]);
+
   const handleModalOpen = () => {
     modalRef.current.showModal();
   };
 
-  const handleBidSubmit = (e) => {
+  const handleSubmitBid = (e) => {
     e.preventDefault();
 
     const form = e.target;
@@ -41,7 +52,7 @@ const ProductDetails = () => {
     const bidData = {
       name: form.name.value,
       buyerEmail: form.email.value,
-      price: form.price.value,
+      price: parseFloat(form.price.value),
       buyerImg: form.image.value,
       buyerContact: form.contact.value,
     };
@@ -59,9 +70,33 @@ const ProductDetails = () => {
       status: "Pending",
     };
 
-    console.log(newBid);
+    // console.log(newBid);
 
-    modalRef.current.close();
+    fetch("http://localhost:3000/bids", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(newBid),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("After Placing Bid", data);
+        if (data.insertedId) {
+          toast.success("Bid Submitted Successfully🎉");
+          modalRef.current.close();
+          form.reset();
+        }
+        newBid._id = data.insertedId;
+        const newBids = [...bids, newBid];
+        newBids.sort((a, b) => b.bid_price - a.bid_price);
+        setBids(newBids);
+      })
+
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to Submit Bid");
+      });
   };
 
   return (
@@ -99,7 +134,7 @@ const ProductDetails = () => {
             <Link className="flex items-center gap-2">
               <RiArrowGoBackFill /> Back to products
             </Link>
-            <h2 className="text-4xl font-bold mt-5">{title}</h2>
+            <h2 className="text-5xl font-bold mt-5">{title}</h2>
             <button className="text-primary font-normal bg-purple-200 py-1.5 text-center px-4 rounded-3xl my-5">
               {category}
             </button>
@@ -184,7 +219,7 @@ const ProductDetails = () => {
                         Give Seller Your Offered Price
                       </h2>
 
-                      <form onSubmit={handleBidSubmit} className="space-y-4">
+                      <form onSubmit={handleSubmitBid} className="space-y-4">
                         {/* Name + Email */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
@@ -227,8 +262,9 @@ const ProductDetails = () => {
                         <div>
                           <label className="text-sm">Place your Price</label>
                           <input
+                            required
                             name="price"
-                            type="text"
+                            type="number"
                             placeholder="e.g. 100"
                             className="input input-bordered w-full mt-1"
                           />
@@ -276,7 +312,63 @@ const ProductDetails = () => {
 
       {/* Bid List for this particular Product */}
 
-      <div className=""></div>
+      <div className="px-14">
+        <h2 className="text-4xl mt-10 font-semibold">
+          Bids For this Product:{" "}
+          <span className="text-gradient">{bids.length}</span>
+        </h2>
+
+        {/* Table ---------->>>>> */}
+
+        <div className="overflow-x-auto">
+          <table className="table">
+            {/* head */}
+            <thead>
+              <tr>
+                <th>SL</th>
+                <th>Buyer Name</th>
+                <th>Buyer Email</th>
+                <th>Bid Price</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bids.map((bid, index) => (
+                <tr>
+                  <th>{index + 1}</th>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="avatar">
+                        <div className="mask mask-squircle h-12 w-12">
+                          <img
+                            src={bid.image}
+                            alt="Avatar Tailwind CSS Component"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold">{bid.buyer_name}</div>
+                        <div className="text-sm opacity-50">United States</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {bid.buyer_email}
+                    <br />
+                    <span className="badge badge-ghost badge-sm">
+                      Desktop Support Technician
+                    </span>
+                  </td>
+                  <td>{bid.bid_price}</td>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
