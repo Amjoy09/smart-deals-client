@@ -3,6 +3,7 @@ import { RiArrowGoBackFill } from "react-icons/ri";
 import { Link, useLoaderData } from "react-router";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const ProductDetails = () => {
   const { customer } = use(AuthContext);
@@ -32,13 +33,22 @@ const ProductDetails = () => {
   const modalRef = useRef(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/products/bids/${productId}`)
-      .then((res) => res.json())
+    axios
+      .get(`http://localhost:3000/products/bids/${productId}`)
       .then((data) => {
-        console.log("Bids for this Product", data);
-        setBids(data);
+        console.log("After axios get", data.data);
+        setBids(data.data);
       });
   }, [productId]);
+
+  // useEffect(() => {
+  //   fetch(`http://localhost:3000/products/bids/${productId}`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log("Bids for this Product", data);
+  //       setBids(data);
+  //     });
+  // }, [productId]);
 
   const handleModalOpen = () => {
     modalRef.current.showModal();
@@ -321,52 +331,58 @@ const ProductDetails = () => {
         {/* Table ---------->>>>> */}
 
         <div className="overflow-x-auto">
-          <table className="table">
-            {/* head */}
-            <thead>
-              <tr>
-                <th>SL</th>
-                <th>Buyer Name</th>
-                <th>Buyer Email</th>
-                <th>Bid Price</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bids.map((bid, index) => (
-                <tr>
-                  <th>{index + 1}</th>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar">
-                        <div className="mask mask-squircle h-12 w-12">
-                          <img
-                            src={bid.image}
-                            alt="Avatar Tailwind CSS Component"
-                          />
+          {bids.length === 0 ? (
+            ""
+          ) : (
+            <table className="table">
+              {/* head */}
+              <thead>
+                <tr className="bg-[#F9FAFB]">
+                  <th>SL</th>
+                  <th>Buyer Name</th>
+                  <th>Buyer Email</th>
+                  <th>Bid Price</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {bids.map((bid, index) => (
+                  <tr>
+                    <th>{index + 1}</th>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <div className="avatar">
+                          <div className="mask mask-squircle h-12 w-12">
+                            <img
+                              src={bid.image}
+                              alt="Avatar Tailwind CSS Component"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-bold">{bid.buyer_name}</div>
+                          <div className="text-sm opacity-50">
+                            United States
+                          </div>
                         </div>
                       </div>
-                      <div>
-                        <div className="font-bold">{bid.buyer_name}</div>
-                        <div className="text-sm opacity-50">United States</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    {bid.buyer_email}
-                    <br />
-                    <span className="badge badge-ghost badge-sm">
-                      Desktop Support Technician
-                    </span>
-                  </td>
-                  <td>{bid.bid_price}</td>
-                  <th>
-                    <button className="btn btn-ghost btn-xs">details</button>
-                  </th>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td>
+                      {bid.buyer_email}
+                      <br />
+                      <span className="badge badge-ghost badge-sm">
+                        Desktop Support Technician
+                      </span>
+                    </td>
+                    <td>{bid.bid_price}</td>
+                    <th>
+                      <button className="btn btn-ghost btn-xs">details</button>
+                    </th>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
